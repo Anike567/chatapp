@@ -33,7 +33,6 @@ app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, "../client/views/signin.html"));
 });
 
-
 app.get('/getusers', function (req, res) {
     User.find()
     .then((docs)=>{
