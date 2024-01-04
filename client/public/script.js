@@ -1,8 +1,13 @@
-const toid = "";
+var toid = "";
 const socket = io();
 var sendBtn = document.getElementsByClassName("send-btn")[0];
 var input = document.querySelector('input');
-var chats = document.getElementsByClassName('chat-body')[0];
+var chats = document.getElementsByClassName('chats')[0];
+var left = document.getElementsByClassName('left')[0];
+var right = document.getElementsByClassName('right')[0];
+
+
+
 
 function send() {
     let msg = input.value;
@@ -18,7 +23,7 @@ function send() {
         chats.appendChild(div);
         socket.emit('chat_message', msg, toid);
         input.value = '';
-        chats.scrollTop = (chats.scrollHeight + 30);
+        chats.scrollTop = (chats.scrollHeight);
     }
 }
 //beneat is socket part
@@ -39,10 +44,15 @@ async function getUsers() {
             usercontainer.classList.add('chatlist-container');
 
             usercontainer.id = element.ioid;
-            usercontainer.addEventListener('click', (e) => { 
+            usercontainer.addEventListener('click', (e) => {
                 console.log(e.target.id);
                 toid = e.target.id;
+                
+                right.style.visibility= 'visible';
+                left.style.visibility='hidden'
             });
+
+
             dpcontainer.classList.add('user-container');
 
             h2.innerHTML = element.name;
@@ -74,3 +84,9 @@ socket.on('message', (msg) => {
     div.appendChild(p);
     chats.appendChild(div);
 });
+
+
+function exit(){
+    right.style.visibility= 'hidden';
+    left.style.visibility='visible';
+}
