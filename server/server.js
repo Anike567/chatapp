@@ -4,11 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
-const { log } = require('console');
 
 
-const users = [];
-var name = "";
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -120,9 +117,7 @@ app.get("/main", function (req, res) {
 
 io.on('connection', (socket) => {
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
+    
 
     socket.on('update', async (msg) => {
         filter={email:msg};
@@ -140,9 +135,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat_message', (data)=>{
-        log(data);
         io.to(data.id).emit('message', data.message);
-    })
+    });
+
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
     
 });
 

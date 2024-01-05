@@ -21,9 +21,9 @@ function send() {
         p.innerHTML = msg;
         div.appendChild(p);
         chats.appendChild(div);
-        var data={
-            message:msg,
-            id:ioid
+        var data = {
+            message: msg,
+            id: ioid
         }
         console.log(data);
         socket.emit('chat_message', data);
@@ -32,11 +32,11 @@ function send() {
     }
 }
 
-function addUser(e){
+function addUser(e) {
     console.log(e.target.id);
-    ioid=e.target.id;    
-    let width=window.innerWidth;
-    if(width<=450){
+    ioid = e.target.id;
+    let width = window.innerWidth;
+    if (width <= 450) {
         forMobie();
     }
 
@@ -89,7 +89,7 @@ function removeAllChildNodes(parent) {
 socket.on('connect', async () => {
     var mail = document.getElementsByClassName('usr-mail')[0].innerHTML;
     await socket.emit('update', mail);
-    setTimeout(()=>getUsers(),1000);
+    getUsers();
 })
 
 socket.on('message', (msg) => {
@@ -102,21 +102,21 @@ socket.on('message', (msg) => {
     chats.appendChild(div);
 });
 
-socket.on('reload',()=>{
+socket.on('reload', () => {
     getUsers();
 })
 
-function exit(){
-    right.style.visibility= 'hidden';
-    left.style.visibility='visible';
-    document.getElementsByClassName('img-container')[0].style.visibility='hidden';
+function exit() {
+    right.style.visibility = 'hidden';
+    left.style.visibility = 'visible';
+    document.getElementsByClassName('img-container')[0].style.visibility = 'hidden';
 }
 
-function forMobie(){
+function forMobie() {
     console.log("its work");
-    document.getElementsByClassName('img-container')[0].style.visibility='visible';
-    right.style.visibility= 'visible';
-    left.style.visibility='hidden';
+    document.getElementsByClassName('img-container')[0].style.visibility = 'visible';
+    right.style.visibility = 'visible';
+    left.style.visibility = 'hidden';
 }
 
 
