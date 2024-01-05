@@ -124,10 +124,10 @@ io.on('connection', (socket) => {
         console.log('A user disconnected');
     });
 
-    socket.on('update', (msg) => {
+    socket.on('update', async (msg) => {
         filter={email:msg};
         update={ioid:socket.id};
-         User.findOneAndUpdate(filter,update,{new:true})
+         await User.findOneAndUpdate(filter,update,{new:true})
             .then((doc)=>{
                 if(!doc){
                     console.log("User not found");
@@ -136,6 +136,7 @@ io.on('connection', (socket) => {
             .catch((err)=>{
                 console.log(err);
             });
+        socket.broadcast.emit('reload')
     });
 
     socket.on('chat_message', (data)=>{

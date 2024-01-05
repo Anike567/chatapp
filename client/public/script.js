@@ -25,6 +25,7 @@ function send() {
             message:msg,
             id:ioid
         }
+        console.log(data);
         socket.emit('chat_message', data);
         input.value = '';
         chats.scrollTop = (chats.scrollHeight);
@@ -42,13 +43,15 @@ function addUser(e){
 }
 
 async function getUsers() {
+    var container = document.getElementsByClassName('chatlist-body')[0];
+    removeAllChildNodes(container);
+
     try {
         console.log('entry');
         const response = await fetch('/getusers');
         const users = await response.json();
         console.log(users);
         users.forEach(element => {
-            var container = document.getElementsByClassName('chatlist-body')[0];
             var usercontainer = document.createElement('div');
             var dpcontainer = document.createElement('div');
             var img = document.createElement('img');
@@ -58,7 +61,6 @@ async function getUsers() {
 
             usercontainer.id = element.ioid;
             usercontainer.addEventListener('click', addUser);
-            
 
             dpcontainer.classList.add('user-container');
 
@@ -69,21 +71,25 @@ async function getUsers() {
             usercontainer.appendChild(h2);
             container.appendChild(usercontainer);
             console.log(element);
-
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error('Error fetching users:', error);
     }
 }
 
-//beneat is socket part
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
+//beneath is socket part
 
 
 socket.on('connect', async () => {
     var mail = document.getElementsByClassName('usr-mail')[0].innerHTML;
     await socket.emit('update', mail);
-    setTimeout(1000, getUsers());
+    setTimeout(()=>getUsers(),1000);
 })
 
 socket.on('message', (msg) => {
@@ -96,6 +102,9 @@ socket.on('message', (msg) => {
     chats.appendChild(div);
 });
 
+socket.on('reload',()=>{
+    getUsers();
+})
 
 function exit(){
     right.style.visibility= 'hidden';
