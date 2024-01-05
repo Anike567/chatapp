@@ -138,9 +138,9 @@ io.on('connection', (socket) => {
             });
     });
 
-    socket.on('chat_message', (message, toid)=>{
-        log(message,toid);
-        io.to(toid).emit('message', message);
+    socket.on('chat_message', (data)=>{
+        log(data);
+        io.to(data.id).emit('message', data.message);
     })
     
 });

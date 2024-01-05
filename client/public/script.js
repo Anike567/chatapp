@@ -21,13 +21,18 @@ function send() {
         p.innerHTML = msg;
         div.appendChild(p);
         chats.appendChild(div);
-        socket.emit('chat_message', msg, toid);
+        var data={
+            message:msg,
+            id:ioid
+        }
+        socket.emit('chat_message', data);
         input.value = '';
         chats.scrollTop = (chats.scrollHeight);
     }
 }
 
 function addUser(e){
+    console.log(e.target.id);
     ioid=e.target.id;    
     let width=window.innerWidth;
     if(width<=450){
