@@ -1,4 +1,4 @@
-var toid = "";
+var toid;
 const socket = io();
 var sendBtn = document.getElementsByClassName("send-btn")[0];
 var input = document.querySelector('input');
@@ -26,6 +26,52 @@ function send() {
         chats.scrollTop = (chats.scrollHeight);
     }
 }
+
+function addUser(e){
+    ioid=e.target.id;    
+    let width=window.innerWidth;
+    if(width<=450){
+        forMobie();
+    }
+
+}
+
+async function getUsers() {
+    try {
+        console.log('entry');
+        const response = await fetch('/getusers');
+        const users = await response.json();
+        console.log(users);
+        users.forEach(element => {
+            var container = document.getElementsByClassName('chatlist-body')[0];
+            var usercontainer = document.createElement('div');
+            var dpcontainer = document.createElement('div');
+            var img = document.createElement('img');
+            var h2 = document.createElement('h2');
+
+            usercontainer.classList.add('chatlist-container');
+
+            usercontainer.id = element.ioid;
+            usercontainer.addEventListener('click', addUser);
+            
+
+            dpcontainer.classList.add('user-container');
+
+            h2.innerHTML = element.name;
+            img.src = "/image/user.jpg";
+            dpcontainer.appendChild(img);
+            usercontainer.appendChild(dpcontainer);
+            usercontainer.appendChild(h2);
+            container.appendChild(usercontainer);
+            console.log(element);
+
+        });
+    }
+    catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+
 //beneat is socket part
 
 
@@ -59,45 +105,4 @@ function forMobie(){
     left.style.visibility='hidden';
 }
 
-async function getUsers() {
-    try {
-        console.log('entry');
-        const response = await fetch('/getusers');
-        const users = await response.json();
-        console.log(users);
-        users.forEach(element => {
-            var container = document.getElementsByClassName('chatlist-body')[0];
-            var usercontainer = document.createElement('div');
-            var dpcontainer = document.createElement('div');
-            var img = document.createElement('img');
-            var h2 = document.createElement('h2');
 
-            usercontainer.classList.add('chatlist-container');
-
-            usercontainer.id = element.ioid;
-            usercontainer.addEventListener('click', (e) => {
-                console.log(e.target.id);
-                toid = e.target.id;
-                let width = window.innerWidth; 
-                if (width <= 450) {
-                    forMobie();
-                }
-            });
-            
-
-            dpcontainer.classList.add('user-container');
-
-            h2.innerHTML = element.name;
-            img.src = "/image/user.jpg";
-            dpcontainer.appendChild(img);
-            usercontainer.appendChild(dpcontainer);
-            usercontainer.appendChild(h2);
-            container.appendChild(usercontainer);
-            console.log(element);
-
-        });
-    }
-    catch (error) {
-        console.error('Error fetching users:', error);
-    }
-}
