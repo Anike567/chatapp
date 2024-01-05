@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
+const { log } = require('console');
 
 
 const users = [];
@@ -37,7 +38,6 @@ app.get('/getusers', function (req, res) {
     User.find()
     .then((docs)=>{
         if(docs){
-            console.log(docs);
             res.send(docs);
         }
         else{
@@ -120,10 +120,6 @@ app.get("/main", function (req, res) {
 
 io.on('connection', (socket) => {
 
-    socket.on('chat_message', (msg) => {
-        socket.broadcast.emit('message', msg);
-    });
-
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
@@ -143,6 +139,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat_message', (message, toid)=>{
+        log(message,toid);
         io.to(toid).emit('message', message);
     })
     

@@ -28,6 +28,37 @@ function send() {
 }
 //beneat is socket part
 
+
+socket.on('connect', async () => {
+    var mail = document.getElementsByClassName('usr-mail')[0].innerHTML;
+    await socket.emit('update', mail);
+    setTimeout(1000, getUsers());
+})
+
+socket.on('message', (msg) => {
+    console.log(msg);
+    let div = document.createElement('div');
+    div.classList.add('receive');
+    let p = document.createElement('p');
+    p.innerHTML = msg;
+    div.appendChild(p);
+    chats.appendChild(div);
+});
+
+
+function exit(){
+    right.style.visibility= 'hidden';
+    left.style.visibility='visible';
+    document.getElementsByClassName('img-container')[0].style.visibility='hidden';
+}
+
+function forMobie(){
+    console.log("its work");
+    document.getElementsByClassName('img-container')[0].style.visibility='visible';
+    right.style.visibility= 'visible';
+    left.style.visibility='hidden';
+}
+
 async function getUsers() {
     try {
         console.log('entry');
@@ -47,8 +78,7 @@ async function getUsers() {
             usercontainer.addEventListener('click', (e) => {
                 console.log(e.target.id);
                 toid = e.target.id;
-                let width = window.innerWidth;  // Fix typo in variable name
-            
+                let width = window.innerWidth; 
                 if (width <= 450) {
                     forMobie();
                 }
@@ -70,33 +100,4 @@ async function getUsers() {
     catch (error) {
         console.error('Error fetching users:', error);
     }
-}
-
-socket.on('connect', async () => {
-    var mail = document.getElementsByClassName('usr-mail')[0].innerHTML;
-    await socket.emit('update', mail);
-    setTimeout(1000, getUsers());
-})
-
-socket.on('message', (msg) => {
-    let div = document.createElement('div');
-    div.classList.add('receive');
-    let p = document.createElement('p');
-    p.innerHTML = msg;
-    div.appendChild(p);
-    chats.appendChild(div);
-});
-
-
-function exit(){
-    right.style.visibility= 'hidden';
-    left.style.visibility='visible';
-    document.getElementsByClassName('img-container')[0].style.visibility='hidden';
-}
-
-function forMobie(){
-    console.log("its work");
-    document.getElementsByClassName('img-container')[0].style.visibility='visible';
-    right.style.visibility= 'visible';
-    left.style.visibility='hidden';
 }
