@@ -47,11 +47,13 @@ async function getUsers() {
             usercontainer.addEventListener('click', (e) => {
                 console.log(e.target.id);
                 toid = e.target.id;
-                
-                right.style.visibility= 'visible';
-                left.style.visibility='hidden'
+                let width = window.innerWidth;  // Fix typo in variable name
+            
+                if (width <= 450) {
+                    forMobie();
+                }
             });
-
+            
 
             dpcontainer.classList.add('user-container');
 
@@ -89,4 +91,12 @@ socket.on('message', (msg) => {
 function exit(){
     right.style.visibility= 'hidden';
     left.style.visibility='visible';
+    document.getElementsByClassName('img-container')[0].style.visibility='hidden';
+}
+
+function forMobie(){
+    console.log("its work");
+    document.getElementsByClassName('img-container')[0].style.visibility='visible';
+    right.style.visibility= 'visible';
+    left.style.visibility='hidden';
 }

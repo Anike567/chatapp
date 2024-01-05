@@ -1,39 +1,47 @@
-*{
+* {
     padding: 0;
     margin: 0;
 }
-body html{
+
+body html {
     height: 100vh;
     width: 100vw;
 }
 
-.root{
-    height: 100vh;
-    width: 100vw;  
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-}
-.container {
-    background-color: black;
-    padding: 40px;
-}
-.tags{
-    margin: 20px 0;
+.root {
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 500px;
 }
-input{
+
+.container {
+    background-color: black;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tags {
+    margin: 20px 0;
+    
+    width: 400px;
+}
+
+input {
     height: 40px;
-    width: 500px;
+    width: 400px;
     text-align: center;
     font-size: 1.6rem;
     color: black;
     border-radius: 20px;
     border: none;
 }
+
 button {
     height: 40px;
     width: 100px;
@@ -45,3 +53,7 @@ button {
     background-color: aqua;
 }
 
+@media screen and (max-width:450px) {
+
+    
+}
