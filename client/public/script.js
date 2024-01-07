@@ -1,8 +1,7 @@
 
-
-var toid;
+var toid=null;
 var from = document.getElementsByClassName('usr-mail')[0].innerHTML;
-var tomail;
+var tomail=null;
 var messages = [];
 const socket = io();
 var sendBtn = document.getElementsByClassName('send-btn')[0];
@@ -49,6 +48,7 @@ function addUser(e) {
 
     ioid = e.target.id;
     tomail = e.target.classList[1];
+    e.target.classList.remove('dot');
     messages[e.target.classList[1]].forEach((element) => {
         let div = document.createElement('div');
         div.classList.add(element.class);
@@ -117,14 +117,14 @@ socket.on('connect', async () => {
 })
 
 socket.on('message', (data) => {
+    console.log(data);
     var msg = {
         msg: data.message.msg,
         class: 'receive'
 
     }
     messages[data.from].push(msg);
-    console.log(toid);
-    if (toid) {
+    if (tomail === data.from) {
         let div = document.createElement('div');
         div.classList.add('receive');
         let p = document.createElement('p');
@@ -132,6 +132,12 @@ socket.on('message', (data) => {
         div.appendChild(p);
         chats.appendChild(div);
     }
+    else{
+        var newmsg=document.getElementsByClassName(data.from)[0];
+        newmsg.classList.add('dot');
+    }
+
+
 
 });
 
@@ -143,6 +149,8 @@ function exit() {
     right.style.visibility = 'hidden';
     left.style.visibility = 'visible';
     document.getElementsByClassName('img-container')[0].style.visibility = 'hidden';
+    tomail=null;
+    toid=null;
 }
 
 function forMobie() {

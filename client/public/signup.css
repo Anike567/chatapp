@@ -53,4 +53,12 @@ button {
 }
 
 @media screen and (max-width:450px) {
+    .container{
+        display: static;
+        text-align: center;
+    }
+
+    input{
+        width: 300px;
+    }
 }
