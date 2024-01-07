@@ -135,7 +135,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat_message', (data)=>{
-        io.to(data.id).emit('message', data.message);
+        console.log(data);
+
+        io.to(data.id).emit('message', data);
     });
 
 
