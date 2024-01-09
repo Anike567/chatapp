@@ -5,6 +5,7 @@ const fs = require('fs');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 
+var signinname,signinmail;
 
 const app = express();
 const server = createServer(app);
@@ -55,21 +56,21 @@ app.get("/signup", function (req, res) {
 
 
 //beneath is post router
-app.post("/verify",function(req,res){
-    let mail=req.body.email;
-    User.find({email:mail})
-        .then((docs)=>{
-            if(docs.length > 0){
-                data={msg:"existing user"}
+app.post("/verify", function (req, res) {
+    let mail = req.body.email;
+    User.find({ email: mail })
+        .then((docs) => {
+            if (docs.length > 0) {
+                data = { msg: "existing user" }
                 res.send(data);
             }
-            else{
-                data={msg:"ready to signup"}
+            else {
+                data = { msg: "ready to signup" }
                 res.send(data);
             }
         })
-        .catch((err)=>{
-            data={msg:"internal server error"}
+        .catch((err) => {
+            data = { msg: "internal server error" }
             res.status(500).send(data);
         })
 });
@@ -85,41 +86,54 @@ app.post("/signup", function (req, res) {
 
     });
     user.save()
-    .then(savedUser => {
-        name = req.body.name;
+        .then(savedUser => {
+            name = req.body.name;
 
-        const htmlPath = path.join(__dirname, "../client/views/main.html");
-        let html = fs.readFileSync(htmlPath, 'utf8');
-        html = html.replace('{{username}}', savedUser.name);
-        html = html.replace('{{mail}}', savedUser.email);
-        res.send(html);
-    })
-    .catch(err => {
-        console.error('Error saving user:', err);
-        res.status(500).send('Error saving user');
-    });
+            const htmlPath = path.join(__dirname, "../client/views/main.html");
+            let html = fs.readFileSync(htmlPath, 'utf8');
+            html = html.replace('{{username}}', savedUser.name);
+            html = html.replace('{{mail}}', savedUser.email);
+            res.send(html);
+        })
+        .catch(err => {
+            console.error('Error saving user:', err);
+            res.status(500).send('Error saving user');
+        });
 });
 
-app.post("/signin", function (req, res) {
-    var mail = req.body.mail;
+app.post("/verifysignin", function (req, res) {
+    var mail = req.body.email;
     var password = req.body.pass;
+    console.log(mail, password);
 
     User.findOne({ email: mail, password: password })
-        .then((docs) => {
-            if (docs) {
-                const htmlPath = path.join(__dirname, "../client/views/main.html");
-                let html = fs.readFileSync(htmlPath, 'utf8');
-                html = html.replace('{{username}}', docs.name);
-                html = html.replace('{{mail}}', docs.email);
-                res.send(html);
-            }
-            else {
-                res.send("Not existing user");
+        .then((user) => {
+            if (user) {
+                signinmail=user.email;
+                signinname=user.name;
+                var data = { msg: "true" };
+                res.send(data);
+            } else {
+                var data = { msg: "false" };
+                res.send(data);
             }
         })
         .catch((err) => {
             console.log(err);
-        })
+            res.status(500).send({ msg: "error" }); // Sending an error status
+        });
+});
+
+
+
+app.post("/signin", function (req, res) {
+    const htmlPath = path.join(__dirname, "../client/views/main.html");
+    let html = fs.readFileSync(htmlPath, 'utf8');
+    html = html.replace('{{username}}', signinname);
+    html = html.replace('{{mail}}', signinmail);
+    signinname=undefined;
+    signinmail=undefined;
+    res.send(html);
 });
 
 app.get("/main", function (req, res) {

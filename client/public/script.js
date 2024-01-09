@@ -1,7 +1,7 @@
 
-var toid=null;
+var toid = null;
 var from = document.getElementsByClassName('usr-mail')[0].innerHTML;
-var tomail=null;
+var tomail = null;
 var messages = [];
 const socket = io();
 var sendBtn = document.getElementsByClassName('send-btn')[0];
@@ -9,6 +9,41 @@ var input = document.querySelector('input');
 var chats = document.getElementsByClassName('chats')[0];
 var left = document.getElementsByClassName('left')[0];
 var right = document.getElementsByClassName('right')[0];
+
+window.addEventListener('unload', function (event) {
+    event.preventDefault();
+    const data = {
+        username: document.getElementsByClassName('username')[0].innerHTML,
+        usermail: document.getElementsByClassName('usr-mail')[0].innerHTML
+    };
+
+    const dataString = JSON.stringify(data);
+    localStorage.setItem('chatAppData', dataString);
+});
+
+
+
+window.onload = function() {
+
+    if (performance.navigation.type === 1) {
+      
+      myFunction();
+    }
+  };
+  
+  function myFunction() {
+    console.log('Page has been reloaded!');
+    // Add your code here
+    const retrievedDataString = localStorage.getItem('chatAppData');
+    const retrievedData = JSON.parse(retrievedDataString);
+    console.log(retrievedData);
+    document.getElementsByClassName('username')[0].innerHTML=retrievedData.username;
+    document.getElementsByClassName('usr-mail')[0].innerHTML=retrievedData.usermail;
+    from=retrievedData.usermail;
+    localStorage.removeItem('chatAppData');
+  }
+  
+
 
 
 
@@ -132,8 +167,8 @@ socket.on('message', (data) => {
         div.appendChild(p);
         chats.appendChild(div);
     }
-    else{
-        var newmsg=document.getElementsByClassName(data.from)[0];
+    else {
+        var newmsg = document.getElementsByClassName(data.from)[0];
         newmsg.classList.add('dot');
     }
 
@@ -149,8 +184,8 @@ function exit() {
     right.style.visibility = 'hidden';
     left.style.visibility = 'visible';
     document.getElementsByClassName('img-container')[0].style.visibility = 'hidden';
-    tomail=null;
-    toid=null;
+    tomail = null;
+    toid = null;
 }
 
 function forMobie() {

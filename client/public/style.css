@@ -53,7 +53,7 @@ html body{
 .chatlist-header{
     width: 100%;
     height: 100px;
-    background-color: blue;
+    background-color: rgb(107, 189, 214);
     display:flex;
     align-items: stretch;
     justify-content: center;
@@ -64,7 +64,7 @@ html body{
     width: 100%;
     padding: 8px 0;
     display: flex;;
-    background-color: blue;
+    background-color: rgb(107, 189, 214);
     border-radius: 10px;
 }
 .img-container{
@@ -90,6 +90,7 @@ html body{
 .chat-body{
     height: 70vh;
     max-height: 70vh;
+    background-color: rgb(223, 238, 188);
     overflow: auto;
 }
 .chats{
@@ -107,7 +108,7 @@ html body{
     border-radius: 10px;
     height: 15%;
     z-index: 3;
-    background-color: blue;
+    background-color: rgb(107, 189, 214);;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,6 +138,24 @@ html body{
 
 }
 
+.send-btn{
+    height: 50px;
+    width: 50px;
+    overflow: hidden;
+    border-radius: 50%;
+
+}
+.send-btn img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    border-radius: inherit;
+    font-weight: bolder;
+    opacity: 70%;;
+}
+.send-btn img:hover{
+    opacity: 100%;
+}
 .chatlist-container{
     text-align: center;
     padding: 20px;
