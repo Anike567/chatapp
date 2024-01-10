@@ -6,7 +6,7 @@ const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 
 var signinname,signinmail;
-
+const connectedUser=[];
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -148,7 +148,7 @@ app.get("/main", function (req, res) {
 
 io.on('connection', (socket) => {
 
-
+    connectedUser.push(socket.id);
 
     socket.on('update', async (msg) => {
         filter = { email: msg };
@@ -166,14 +166,27 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat_message', (data) => {
-        console.log(data);
 
-        io.to(data.id).emit('message', data);
+        if(connectedUser.includes(data.id)){
+            console.log(data);
+            io.to(data.id).emit('message',data)
+        }
+
+        else{
+            console.log("user is not login");
+        }
+        
+        
     });
+    
 
 
     socket.on('disconnect', () => {
         console.log('A user disconnected');
+        var index=connectedUser.indexOf(socket.id);
+        if(index != -1){
+            connectedUser.splice(index,1);
+        }
     });
 
 });

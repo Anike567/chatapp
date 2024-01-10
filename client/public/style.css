@@ -31,14 +31,14 @@ html body{
     border:4px solid white ;
     border-radius: 10px;
     z-index: 10;
-    background-color: rgb(248, 227, 199);
+    background-color: rgb(252, 250, 248);
 }
 .chatlist-body{
     margin: 10px auto;
     overflow: auto;
     background-color:rgb(252, 249, 246);
-    max-height: 85%;
-    height: 100%;
+    max-height: calc(100% - 100px);
+    
 }
 .right{
     height: 100%;
@@ -62,8 +62,7 @@ html body{
 }
 .chat-header{
     width: 100%;
-    padding: 8px 0;
-    display: flex;;
+    height: 100px;
     background-color: rgb(107, 189, 214);
     border-radius: 10px;
 }
@@ -88,16 +87,15 @@ html body{
     width: max-content;
 }
 .chat-body{
-    height: 70vh;
-    max-height: 70vh;
-    background-color: rgb(223, 238, 188);
+    height:calc(100% - 100px);
+    max-height: (100% - 100px);
     overflow: auto;
 }
 .chats{
     max-width: 100%;
     width: 100%;
     max-height: calc(84% - 4px);
-    height: calc(84% - 4px);
+    height: 100%;
     overflow: auto;
 
 }
@@ -106,7 +104,7 @@ html body{
     max-width: 100%;
     border: 4px solid white;
     border-radius: 10px;
-    height: 15%;
+    height: 100px;
     z-index: 3;
     background-color: rgb(107, 189, 214);;
     display: flex;
@@ -152,9 +150,10 @@ html body{
     border-radius: inherit;
     font-weight: bolder;
     opacity: 70%;;
+    mix-blend-mode: color-burn;
 }
 .send-btn img:hover{
-    opacity: 100%;
+    opacity: 150%;
 }
 .chatlist-container{
     text-align: center;
@@ -274,16 +273,13 @@ p{
         top: 0;
         height: 100%;   
     }
-    .chat-body{
-        max-height: 100%;
-        height: 100%;
-    }
-    .chats{
-        height: 70vh;
-        max-height: 80vh;
-    }
+    
+    .chat{
+        height:calc (100vh - 100px);
+        max-height: calc(100vh - 100px);
+    } 
     .reader{
-        height: 9vh;
+        height: 80px;
     }
     .send{
 
