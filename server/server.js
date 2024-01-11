@@ -104,7 +104,7 @@ app.post("/signup", function (req, res) {
 app.post("/verifysignin", function (req, res) {
     var mail = req.body.email;
     var password = req.body.pass;
-    console.log(mail, password);
+
 
     User.findOne({ email: mail, password: password })
         .then((user) => {
@@ -166,9 +166,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat_message', (data) => {
-
+        console.log(data);
         if(connectedUser.includes(data.id)){
-            console.log(data);
+            
             io.to(data.id).emit('message',data)
         }
 

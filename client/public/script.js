@@ -1,4 +1,3 @@
-
 var toid = null;
 var from = document.getElementsByClassName('usr-mail')[0].innerHTML;
 var tomail = null;
@@ -11,54 +10,52 @@ var left = document.getElementsByClassName('left')[0];
 var right = document.getElementsByClassName('right')[0];
 
 window.addEventListener('unload', function (event) {
-    event.preventDefault();
     const data = {
         username: document.getElementsByClassName('username')[0].innerHTML,
         usermail: document.getElementsByClassName('usr-mail')[0].innerHTML
     };
-
+    console.log(messages);
+    localStorage.setItem('chatAppMessage', JSON.stringify(messages));
     const dataString = JSON.stringify(data);
     localStorage.setItem('chatAppData', dataString);
 });
 
-
-
-window.onload = function() {
-
+window.onload = function () {
+    let messagesString = localStorage.getItem('chatAppMessage');
+    messages = messagesString ? JSON.parse(messagesString) : {};
+    console.log("previous messages are ", messages);
     if (performance.navigation.type === 1) {
-      
-      myFunction();
+        myFunction();
     }
-  };
-  
-  function myFunction() {
+};
+
+
+function myFunction() {
     console.log('Page has been reloaded!');
     // Add your code here
     const retrievedDataString = localStorage.getItem('chatAppData');
     const retrievedData = JSON.parse(retrievedDataString);
     console.log(retrievedData);
-    document.getElementsByClassName('username')[0].innerHTML=retrievedData.username;
-    document.getElementsByClassName('usr-mail')[0].innerHTML=retrievedData.usermail;
-    from=retrievedData.usermail;
+    document.getElementsByClassName('username')[0].innerHTML = retrievedData.username;
+    document.getElementsByClassName('usr-mail')[0].innerHTML = retrievedData.usermail;
+    from = retrievedData.usermail;
     localStorage.removeItem('chatAppData');
-  }
-  
-
-
-
+}
 
 function send(e) {
     let inputMsg = input.value;
-    if (msg === "") {
-        alert("You can not send empty messages");
-    }
-    else {
+    if (inputMsg === "") {
+        alert("You cannot send empty messages");
+    } else {
+        // Check if messages[tomail] exists, if not, create it
+        if (!messages[tomail]) {
+            messages[tomail] = [];
+        }
 
         var msg = {
             msg: inputMsg,
             class: "send"
-
-        }
+        };
         messages[tomail].push(msg);
 
         let div = document.createElement('div');
@@ -69,19 +66,23 @@ function send(e) {
         chats.appendChild(div);
         var data = {
             message: msg,
-            id: ioid,
+            id: toid,
             from: from
-        }
+        };
         socket.emit('chat_message', data);
         input.value = '';
+        input.focus();
         chats.scrollTop = (chats.scrollHeight);
     }
+    console.log(messages);
 }
+
+// ... (rest of your code)
 
 function addUser(e) {
     removeAllChildNodes(chats);
 
-    ioid = e.target.id;
+    toid = e.target.id;
     tomail = e.target.classList[1];
     e.target.classList.remove('dot');
     messages[e.target.classList[1]].forEach((element) => {
@@ -109,8 +110,10 @@ async function getUsers() {
         let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
         users.forEach(element => {
             if (usrmail != element.email) {
-                messages[element.email] = [];
-
+                
+                if(!messages[element.email]){
+                    messages[element.email] = []
+                }
                 var usercontainer = document.createElement('div');
                 var dpcontainer = document.createElement('div');
                 var img = document.createElement('img');
