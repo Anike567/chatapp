@@ -1,6 +1,8 @@
 var form = document.querySelector('form');
+var button=document.querySelector('button');
 form.addEventListener('submit', async function (event) {
     event.preventDefault();
+    button.disabled=true
     var email = document.getElementsByName("mail")[0].value;
     var password = document.getElementsByName("pass")[0].value;
     console.log(email, password);

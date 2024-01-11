@@ -1,8 +1,9 @@
 
 const form = document.querySelector('form');
-
+const button=document.querySelector('button');
 form.addEventListener('submit', async function (event) {
     event.preventDefault();
+    button.disabled=true;
     
     var email = document.getElementsByName("mail")[0].value; 
     console.log(email);
@@ -21,5 +22,6 @@ form.addEventListener('submit', async function (event) {
     }
     else{
         alert("This email is already exists try to login");
+        button.disabled=false;
     }
 });
