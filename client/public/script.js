@@ -42,7 +42,7 @@ function myFunction() {
     localStorage.removeItem('chatAppData');
 }
 
-function send(e) {
+function send() {
     let inputMsg = input.value;
     if (inputMsg === "") {
         alert("You cannot send empty messages");
@@ -201,3 +201,8 @@ function forMobie() {
 
 
 sendBtn.addEventListener('click', send);
+input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        send();
+    }
+});
