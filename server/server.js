@@ -1,3 +1,4 @@
+const LinkList = require('./linklist');
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -5,11 +6,14 @@ const fs = require('fs');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 
-var signinname,signinmail;
-const connectedUser=[];
+var signinname, signinmail;
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+
+
+const connectedUser = new LinkList();
+
 
 
 mongoose.connect('mongodb+srv://admin-aniket:Test123@cluster0.bikic.mongodb.net/userDB').catch(err => console.log(err));
@@ -109,8 +113,8 @@ app.post("/verifysignin", function (req, res) {
     User.findOne({ email: mail, password: password })
         .then((user) => {
             if (user) {
-                signinmail=user.email;
-                signinname=user.name;
+                signinmail = user.email;
+                signinname = user.name;
                 var data = { msg: "true" };
                 res.send(data);
             } else {
@@ -131,8 +135,8 @@ app.post("/signin", function (req, res) {
     let html = fs.readFileSync(htmlPath, 'utf8');
     html = html.replace('{{username}}', signinname);
     html = html.replace('{{mail}}', signinmail);
-    signinname=undefined;
-    signinmail=undefined;
+    signinname = undefined;
+    signinmail = undefined;
     res.send(html);
 });
 
@@ -146,9 +150,9 @@ app.get("/main", function (req, res) {
 
 // beneath is socket.io part;
 
-io.on('connection', (socket) => {
+io.on('connection', async(socket) => {
 
-    connectedUser.push(socket.id);
+    await connectedUser.insert(socket.id);
 
     socket.on('update', async (msg) => {
         filter = { email: msg };
@@ -167,26 +171,34 @@ io.on('connection', (socket) => {
 
     socket.on('chat_message', (data) => {
         console.log(data);
-        if(connectedUser.includes(data.id)){
-            
-            io.to(data.id).emit('message',data)
-        }
+        if (connectedUser.find(data.id)) {
 
-        else{
+
+            
+            io.to(data.id).emit('message', data);
+        }
+        else {
             console.log("user is not login");
         }
-        
-        
+        connectedUser.print();
+
+
     });
-    
 
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-        var index=connectedUser.indexOf(socket.id);
-        if(index != -1){
-            connectedUser.splice(index,1);
+
+    socket.on('disconnect', async() => {
+
+
+        let flag=await connectedUser.findAndDelete(socket.id);
+        if (flag) {
+            console.log('A user disconnected');
         }
+        else {
+            console.log("Not existed user");
+        }
+        connectedUser.print();
+
     });
 
 });
