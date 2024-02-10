@@ -1,4 +1,5 @@
 const LinkList = require('./linklist');
+const User_list = require('./onlineusermessage');
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -13,7 +14,7 @@ const io = new Server(server);
 
 
 const connectedUser = new LinkList();
-
+const userList=new User_list();
 
 
 mongoose.connect('mongodb+srv://admin-aniket:Test123@cluster0.bikic.mongodb.net/userDB').catch(err => console.log(err));
@@ -170,17 +171,20 @@ io.on('connection', async(socket) => {
     });
 
     socket.on('chat_message', (data) => {
-        console.log(data);
         if (connectedUser.find(data.id)) {
-
-
-            
             io.to(data.id).emit('message', data);
         }
         else {
-            console.log("user is not login");
+            let temp=userList.find(data.tomail);
+            if(temp){
+                temp.msg.push({ from: data.from, msg: data.message.msg });
+            }
+            else{
+                let temp=userList.insert(data.tomail);
+                temp.msg.push({ from: data.from, msg: data.message.msg });
+            }
         }
-        connectedUser.print();
+        userList.print();
 
 
     });
