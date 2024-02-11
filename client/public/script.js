@@ -1,4 +1,5 @@
 var toid = null;
+var tomail = null;
 var from = document.getElementsByClassName('usr-mail')[0].innerHTML;
 var tomail = null;
 var messages = [];
@@ -14,7 +15,6 @@ window.addEventListener('unload', function (event) {
         username: document.getElementsByClassName('username')[0].innerHTML,
         usermail: document.getElementsByClassName('usr-mail')[0].innerHTML
     };
-    console.log(messages);
     localStorage.setItem('chatAppMessage', JSON.stringify(messages));
     const dataString = JSON.stringify(data);
     localStorage.setItem('chatAppData', dataString);
@@ -23,19 +23,18 @@ window.addEventListener('unload', function (event) {
 window.onload = function () {
     let messagesString = localStorage.getItem('chatAppMessage');
     messages = messagesString ? JSON.parse(messagesString) : {};
-    console.log("previous messages are ", messages);
     if (performance.navigation.type === 1) {
         myFunction();
+     
     }
 };
 
 
 function myFunction() {
-    console.log('Page has been reloaded!');
+
     // Add your code here
     const retrievedDataString = localStorage.getItem('chatAppData');
     const retrievedData = JSON.parse(retrievedDataString);
-    console.log(retrievedData);
     document.getElementsByClassName('username')[0].innerHTML = retrievedData.username;
     document.getElementsByClassName('usr-mail')[0].innerHTML = retrievedData.usermail;
     from = retrievedData.usermail;
@@ -67,14 +66,14 @@ function send() {
         var data = {
             message: msg,
             id: toid,
-            from: from
+            from: from,
+            tomail: tomail
         };
         socket.emit('chat_message', data);
         input.value = '';
         input.focus();
         chats.scrollTop = (chats.scrollHeight);
     }
-    console.log(messages);
 }
 
 // ... (rest of your code)
@@ -83,6 +82,8 @@ function addUser(e) {
     removeAllChildNodes(chats);
 
     toid = e.target.id;
+    tomail = e.target.classList[1];
+
     tomail = e.target.classList[1];
     e.target.classList.remove('dot');
     messages[e.target.classList[1]].forEach((element) => {
@@ -108,10 +109,10 @@ async function getUsers() {
         const response = await fetch('/getusers');
         const users = await response.json();
         let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
-        users.forEach(element => {
+        await users.forEach(element => {
             if (usrmail != element.email) {
-                
-                if(!messages[element.email]){
+
+                if (!messages[element.email]) {
                     messages[element.email] = []
                 }
                 var usercontainer = document.createElement('div');
@@ -133,11 +134,36 @@ async function getUsers() {
                 usercontainer.appendChild(h2);
                 container.appendChild(usercontainer);
             }
+
         });
+        getMessages();
     } catch (error) {
         console.error('Error fetching users:', error);
     }
 }
+
+async function getMessages() {
+    const response = await fetch("/getmesseges", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username: from })
+    });
+    const data = await response.json();
+    data.forEach(element => {
+        var msg = {
+            msg: element.msg,
+            class: 'receive'
+    
+        }   
+        console.log(messages[element.from]);
+        messages[element.from].push(msg); 
+        
+    });
+}
+
+
 
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {
@@ -152,10 +178,11 @@ socket.on('connect', async () => {
     var mail = document.getElementsByClassName('usr-mail')[0].innerHTML;
     await socket.emit('update', mail);
     getUsers();
+    getMessages();
 })
 
 socket.on('message', (data) => {
-    console.log(data);
+
     var msg = {
         msg: data.message.msg,
         class: 'receive'
@@ -169,6 +196,7 @@ socket.on('message', (data) => {
         p.innerHTML = data.message.msg;
         div.appendChild(p);
         chats.appendChild(div);
+        chats.scrollTop = (chats.scrollHeight);
     }
     else {
         var newmsg = document.getElementsByClassName(data.from)[0];

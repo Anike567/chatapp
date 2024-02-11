@@ -60,6 +60,9 @@ app.get("/signup", function (req, res) {
 
 
 
+
+
+
 //beneath is post router
 app.post("/verify", function (req, res) {
     let mail = req.body.email;
@@ -147,6 +150,22 @@ app.get("/main", function (req, res) {
 
 
 
+// api for sending msg when the user is offline
+
+app.post("/getmesseges",function(req,res){
+    let username=req.body.username;
+    let temp=userList.findAndDelete(username);
+    if(temp !== null){
+        let data=express.json
+        res.send(temp.msg);
+    }
+    else {
+        res.send([]);
+    }
+});
+
+
+
 
 
 // beneath is socket.io part;
@@ -170,7 +189,7 @@ io.on('connection', async(socket) => {
         socket.broadcast.emit('reload')
     });
 
-    socket.on('chat_message', (data) => {
+    socket.on('chat_message',  (data) => {
         if (connectedUser.find(data.id)) {
             io.to(data.id).emit('message', data);
         }

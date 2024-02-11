@@ -27,14 +27,47 @@ class User_list {
 
     find(username) {
         let temp = this.head;
+        if(this.head == null){
+            return null;
+        }
         while (temp != null) {
             if (temp.username === username) {
                 return temp;
             }
             temp = temp.next;
         }
-        return false;
+        return null;
     }
+    findAndDelete(username) {
+        let temp = this.head;
+        let pre = null;
+        let deletedNode = null;
+        
+        while (temp != null) {
+            if (temp.username === username) {
+                if (pre === null) {
+                    // If the node to be deleted is the head node
+                    this.head = temp.next;
+                    // Update last if head is null (no nodes left)
+                    if (this.head === null) {
+                        this.last = null;
+                    }
+                } else {
+                    pre.next = temp.next;
+                    // If the node to be deleted is the last node
+                    if (temp.next === null) {
+                        this.last = pre;
+                    }
+                }
+                deletedNode = temp;
+                break;
+            }
+            pre = temp;
+            temp = temp.next;
+        }
+        return deletedNode;
+    }
+    
     print(){
         let temp=this.head;
         while(temp != null){
