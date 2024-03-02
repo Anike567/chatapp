@@ -1,8 +1,8 @@
 var form = document.querySelector('form');
-var button=document.querySelector('button');
+var button = document.querySelector('button');
 form.addEventListener('submit', async function (event) {
     event.preventDefault();
-    button.disabled=true
+    button.disabled = true;
     var email = document.getElementsByName("mail")[0].value;
     var password = document.getElementsByName("pass")[0].value;
     console.log(email, password);
@@ -17,12 +17,23 @@ form.addEventListener('submit', async function (event) {
             pass: password
         })
     });
-
-    var rs = await response.json();
-    console.log(rs);
-    if (rs.msg == "true") {
-        form.submit();
-    } else {
-        alert("Either username or password are incorrect");
+    if (response.ok) {
+        var rs = await response.json();
+        if (rs.msg == "true") {
+            const header=response.headers
+            const cookies=header.get('Set-Cookie');
+            if(cookies){
+                const cookiesArray=cookies.split(';');
+                cookiesArray.forEach(element => {
+                    document.cookie=element;
+                });
+            }
+            form.submit();
+            console.log(rs);
+        } else {
+            alert("Either username or password are incorrect");
+            button.disabled = false;
+        }
     }
+
 })

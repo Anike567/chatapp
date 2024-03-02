@@ -10,6 +10,33 @@ var chats = document.getElementsByClassName('chats')[0];
 var left = document.getElementsByClassName('left')[0];
 var right = document.getElementsByClassName('right')[0];
 
+function logout() {
+    const currentDate = new Date();
+    const dayOfMonth = currentDate.getDate();
+    const dayOfWeekIndex = currentDate.getDay();
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = weekdays[dayOfWeekIndex];
+
+ 
+    const expires = `${dayOfWeek}, ${dayOfMonth} ${currentDate.toLocaleString('en-us', { month: 'short' })} ${currentDate.getFullYear()} 00:00:00 GMT`;
+
+
+    document.cookie = `sessionid=; expires=${expires}; path=/;`;
+    window.location.href = "/";
+}
+
+
+function getCookiesAndUpdateUsername() {
+    var userName = document.getElementsByClassName('username')[0];
+    var userMail = document.getElementsByClassName('usr-mail')[0];
+    const cookies = document.cookie.split(';');
+    let usernam = cookies[2].trim().split('=');
+    userName.innerHTML = decodeURIComponent(usernam[1]);
+    let userml = cookies[1].trim().split('=');
+    userMail.innerHTML = decodeURIComponent(userml[1]);
+}
+
+
 window.addEventListener('unload', function (event) {
     const data = {
         username: document.getElementsByClassName('username')[0].innerHTML,
@@ -21,11 +48,13 @@ window.addEventListener('unload', function (event) {
 });
 
 window.onload = function () {
+
+    getCookiesAndUpdateUsername();
     let messagesString = localStorage.getItem('chatAppMessage');
     messages = messagesString ? JSON.parse(messagesString) : {};
     if (performance.navigation.type === 1) {
         myFunction();
-     
+
     }
 };
 
@@ -155,11 +184,11 @@ async function getMessages() {
         var msg = {
             msg: element.msg,
             class: 'receive'
-    
-        }   
+
+        }
         console.log(messages[element.from]);
-        messages[element.from].push(msg); 
-        
+        messages[element.from].push(msg);
+
     });
 }
 

@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
+const cookieParser = require('cookie-parser');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 
@@ -12,9 +13,10 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+app.use(cookieParser());
 
 const connectedUser = new LinkList();
-const userList=new User_list();
+const userList = new User_list();
 
 
 mongoose.connect('mongodb+srv://admin-aniket:Test123@cluster0.bikic.mongodb.net/userDB').catch(err => console.log(err));
@@ -117,10 +119,13 @@ app.post("/verifysignin", function (req, res) {
     User.findOne({ email: mail, password: password })
         .then((user) => {
             if (user) {
-                signinmail = user.email;
-                signinname = user.name;
-                var data = { msg: "true" };
-                res.send(data);
+                var data = {
+                    msg: "true",
+                }
+                res.cookie('sessionid', user._id.toString());
+                res.cookie('usermail', user.email);
+                res.cookie('username', user.name);
+                res.send(data)
             } else {
                 var data = { msg: "false" };
                 res.send(data);
@@ -135,28 +140,36 @@ app.post("/verifysignin", function (req, res) {
 
 
 app.post("/signin", function (req, res) {
-    const htmlPath = path.join(__dirname, "../client/views/main.html");
-    let html = fs.readFileSync(htmlPath, 'utf8');
-    html = html.replace('{{username}}', signinname);
-    html = html.replace('{{mail}}', signinmail);
-    signinname = undefined;
-    signinmail = undefined;
-    res.send(html);
+    const { usermail, sessionid } = req.cookies;
+
+    if (!usermail || !sessionid) {
+        return res.redirect("/");
+    }
+    else{
+        res.redirect("/main");
+    }
 });
 
 app.get("/main", function (req, res) {
-    res.sendFile(path.join(__dirname, ("../client/views/main.html")));
+    const { usermail, sessionid } = req.cookies;
+
+    if (!usermail || !sessionid) {
+        return res.redirect("/");
+    }
+    else{
+        res.sendFile(path.join(__dirname, ("../client/views/main.html")));
+    }
 });
 
 
 
 // api for sending msg when the user is offline
 
-app.post("/getmesseges",function(req,res){
-    let username=req.body.username;
-    let temp=userList.findAndDelete(username);
-    if(temp !== null){
-        let data=express.json
+app.post("/getmesseges", function (req, res) {
+    let username = req.body.username;
+    let temp = userList.findAndDelete(username);
+    if (temp !== null) {
+        let data = express.json
         res.send(temp.msg);
     }
     else {
@@ -170,7 +183,7 @@ app.post("/getmesseges",function(req,res){
 
 // beneath is socket.io part;
 
-io.on('connection', async(socket) => {
+io.on('connection', async (socket) => {
 
     await connectedUser.insert(socket.id);
 
@@ -189,17 +202,17 @@ io.on('connection', async(socket) => {
         socket.broadcast.emit('reload')
     });
 
-    socket.on('chat_message',  (data) => {
+    socket.on('chat_message', (data) => {
         if (connectedUser.find(data.id)) {
             io.to(data.id).emit('message', data);
         }
         else {
-            let temp=userList.find(data.tomail);
-            if(temp){
+            let temp = userList.find(data.tomail);
+            if (temp) {
                 temp.msg.push({ from: data.from, msg: data.message.msg });
             }
-            else{
-                let temp=userList.insert(data.tomail);
+            else {
+                let temp = userList.insert(data.tomail);
                 temp.msg.push({ from: data.from, msg: data.message.msg });
             }
         }
@@ -210,10 +223,10 @@ io.on('connection', async(socket) => {
 
 
 
-    socket.on('disconnect', async() => {
+    socket.on('disconnect', async () => {
 
 
-        let flag=await connectedUser.findAndDelete(socket.id);
+        let flag = await connectedUser.findAndDelete(socket.id);
         if (flag) {
             console.log('A user disconnected');
         }
