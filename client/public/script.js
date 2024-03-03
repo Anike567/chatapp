@@ -1,6 +1,7 @@
 var toid = null;
 var tomail = null;
-var from = document.getElementsByClassName('usr-mail')[0].innerHTML;
+var from=null;
+
 var tomail = null;
 var messages = [];
 const socket = io();
@@ -30,10 +31,18 @@ function getCookiesAndUpdateUsername() {
     var userName = document.getElementsByClassName('username')[0];
     var userMail = document.getElementsByClassName('usr-mail')[0];
     const cookies = document.cookie.split(';');
-    let usernam = cookies[2].trim().split('=');
-    userName.innerHTML = decodeURIComponent(usernam[1]);
-    let userml = cookies[1].trim().split('=');
-    userMail.innerHTML = decodeURIComponent(userml[1]);
+    cookies.forEach((element)=>{
+        let key=element.trim().split('=');
+        if(key[0]==='usermail'){
+            from=decodeURIComponent(key[1]);
+            userMail.innerHTML = decodeURIComponent(key[1]);
+        }
+        if(key[0] === 'username'){
+            userName.innerHTML = decodeURIComponent(key[1]);    
+        }
+    });
+    
+    
 }
 
 
@@ -61,7 +70,7 @@ window.onload = function () {
 
 function myFunction() {
 
-    // Add your code here
+    
     const retrievedDataString = localStorage.getItem('chatAppData');
     const retrievedData = JSON.parse(retrievedDataString);
     document.getElementsByClassName('username')[0].innerHTML = retrievedData.username;
@@ -139,6 +148,7 @@ async function getUsers() {
         const users = await response.json();
         let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
         await users.forEach(element => {
+            console.log(element);
             if (usrmail != element.email) {
 
                 if (!messages[element.email]) {
@@ -186,7 +196,7 @@ async function getMessages() {
             class: 'receive'
 
         }
-        console.log(messages[element.from]);
+        // console.log(messages[element.from]);
         messages[element.from].push(msg);
 
     });
@@ -211,6 +221,7 @@ socket.on('connect', async () => {
 })
 
 socket.on('message', (data) => {
+    // console.log(data);
 
     var msg = {
         msg: data.message.msg,

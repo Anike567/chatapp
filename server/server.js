@@ -15,7 +15,7 @@ const io = new Server(server);
 
 app.use(cookieParser());
 
-const connectedUser = new LinkList();
+const connectedUser = [];
 const userList = new User_list();
 
 
@@ -183,9 +183,11 @@ app.post("/getmesseges", function (req, res) {
 
 // beneath is socket.io part;
 
+
 io.on('connection', async (socket) => {
 
-    await connectedUser.insert(socket.id);
+    console.log(socket.id);
+    connectedUser.push(socket.id);
 
     socket.on('update', async (msg) => {
         filter = { email: msg };
@@ -198,15 +200,20 @@ io.on('connection', async (socket) => {
             })
             .catch((err) => {
                 console.log(err);
+            })
+            .then(() => {
+                socket.broadcast.emit('reload');
             });
-        socket.broadcast.emit('reload')
     });
+    
 
     socket.on('chat_message', (data) => {
-        if (connectedUser.find(data.id)) {
+        let index=connectedUser.indexOf(data.id);
+        if (index !== -1) {
             io.to(data.id).emit('message', data);
         }
         else {
+            console.log("Not existing user msg is saved in database");
             let temp = userList.find(data.tomail);
             if (temp) {
                 temp.msg.push({ from: data.from, msg: data.message.msg });
@@ -216,7 +223,6 @@ io.on('connection', async (socket) => {
                 temp.msg.push({ from: data.from, msg: data.message.msg });
             }
         }
-        userList.print();
 
 
     });
@@ -224,18 +230,15 @@ io.on('connection', async (socket) => {
 
 
     socket.on('disconnect', async () => {
-
-
-        let flag = await connectedUser.findAndDelete(socket.id);
-        if (flag) {
-            console.log('A user disconnected');
+        let index = connectedUser.indexOf(socket.id);
+        if (index !== -1) {
+            connectedUser.splice(index, 1); 
         }
-        else {
-            console.log("Not existed user");
+        else{
+            console.log("user not find");
         }
-        connectedUser.print();
-
     });
+    
 
 });
 
