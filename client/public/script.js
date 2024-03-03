@@ -141,7 +141,7 @@ function addUser(e) {
 
 async function getUsers() {
     var container = document.getElementsByClassName('chatlist-body')[0];
-    // removeAllChildNodes(container);
+    removeAllChildNodes(container);
 
     try {
         const response = await fetch('/getusers');
