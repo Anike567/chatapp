@@ -103,7 +103,7 @@ app.post("/signup", function (req, res) {
             let html = fs.readFileSync(htmlPath, 'utf8');
             html = html.replace('{{username}}', savedUser.name);
             html = html.replace('{{mail}}', savedUser.email);
-            res.send(html);
+            res.redirect("/main");
         })
         .catch(err => {
             console.error('Error saving user:', err);
@@ -192,18 +192,16 @@ io.on('connection', async (socket) => {
     socket.on('update', async (msg) => {
         filter = { email: msg };
         update = { ioid: socket.id };
-        await User.findOneAndUpdate(filter, update, { new: true })
-            .then((doc) => {
-                if (!doc) {
-                    console.log("User not found");
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-            .then(() => {
+        try {
+            const doc = await User.findOneAndUpdate(filter, update, { new: true });
+            if (!doc) {
+                console.log("User not found");
+            } else {
                 socket.broadcast.emit('reload');
-            });
+            }
+        } catch (err) {
+            console.log(err);
+        }
     });
     
 

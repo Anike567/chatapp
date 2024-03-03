@@ -1,6 +1,6 @@
 var toid = null;
 var tomail = null;
-var from=null;
+var from = null;
 
 var tomail = null;
 var messages = [];
@@ -18,7 +18,7 @@ function logout() {
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayOfWeek = weekdays[dayOfWeekIndex];
 
- 
+
     const expires = `${dayOfWeek}, ${dayOfMonth} ${currentDate.toLocaleString('en-us', { month: 'short' })} ${currentDate.getFullYear()} 00:00:00 GMT`;
 
 
@@ -31,18 +31,18 @@ function getCookiesAndUpdateUsername() {
     var userName = document.getElementsByClassName('username')[0];
     var userMail = document.getElementsByClassName('usr-mail')[0];
     const cookies = document.cookie.split(';');
-    cookies.forEach((element)=>{
-        let key=element.trim().split('=');
-        if(key[0]==='usermail'){
-            from=decodeURIComponent(key[1]);
+    cookies.forEach((element) => {
+        let key = element.trim().split('=');
+        if (key[0] === 'usermail') {
+            from = decodeURIComponent(key[1]);
             userMail.innerHTML = decodeURIComponent(key[1]);
         }
-        if(key[0] === 'username'){
-            userName.innerHTML = decodeURIComponent(key[1]);    
+        if (key[0] === 'username') {
+            userName.innerHTML = decodeURIComponent(key[1]);
         }
     });
-    
-    
+
+
 }
 
 
@@ -70,7 +70,7 @@ window.onload = function () {
 
 function myFunction() {
 
-    
+
     const retrievedDataString = localStorage.getItem('chatAppData');
     const retrievedData = JSON.parse(retrievedDataString);
     document.getElementsByClassName('username')[0].innerHTML = retrievedData.username;
@@ -141,7 +141,7 @@ function addUser(e) {
 
 async function getUsers() {
     var container = document.getElementsByClassName('chatlist-body')[0];
-    removeAllChildNodes(container);
+    // removeAllChildNodes(container);
 
     try {
         const response = await fetch('/getusers');
@@ -172,12 +172,36 @@ async function getUsers() {
                 usercontainer.appendChild(dpcontainer);
                 usercontainer.appendChild(h2);
                 container.appendChild(usercontainer);
+
             }
 
+
         });
-        getMessages();
     } catch (error) {
         console.error('Error fetching users:', error);
+    }
+}
+
+async function getUpdate() {
+    try {
+        const response = await fetch('/getusers');
+        if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+        const users = await response.json();
+        let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
+        for (const element of users) {
+            console.log(element);
+            if (usrmail !== element.email) {
+                let list = document.getElementsByClassName(element.email)[0];
+                if ( list.id === toid) {
+                    toid = element.ioid;
+                }
+                list.id = element.ioid;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error.message);
     }
 }
 
@@ -248,7 +272,7 @@ socket.on('message', (data) => {
 });
 
 socket.on('reload', () => {
-    getUsers();
+    getUpdate();
 })
 
 function exit() {
