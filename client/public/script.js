@@ -12,6 +12,7 @@ var left = document.getElementsByClassName('left')[0];
 var right = document.getElementsByClassName('right')[0];
 
 function logout() {
+    localStorage.setItem('chatAppMessage', JSON.stringify(messages));
     const currentDate = new Date();
     const dayOfMonth = currentDate.getDate();
     const dayOfWeekIndex = currentDate.getDay();
