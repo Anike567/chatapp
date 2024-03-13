@@ -149,7 +149,6 @@ async function getUsers() {
         const users = await response.json();
         let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
         await users.forEach(element => {
-            console.log(element);
             if (usrmail != element.email) {
 
                 if (!messages[element.email]) {
@@ -192,7 +191,6 @@ async function getUpdate() {
         const users = await response.json();
         let usrmail = document.getElementsByClassName('usr-mail')[0].innerHTML;
         for (const element of users) {
-            console.log(element);
             if (usrmail !== element.email) {
                 let list = document.getElementsByClassName(element.email)[0];
                 if ( list.id === toid) {
@@ -221,7 +219,6 @@ async function getMessages() {
             class: 'receive'
 
         }
-        // console.log(messages[element.from]);
         messages[element.from].push(msg);
 
     });
@@ -246,7 +243,7 @@ socket.on('connect', async () => {
 })
 
 socket.on('message', (data) => {
-    // console.log(data);
+
 
     var msg = {
         msg: data.message.msg,
@@ -274,6 +271,12 @@ socket.on('message', (data) => {
 
 socket.on('reload', () => {
     getUpdate();
+});
+
+socket.on('typing',function(data){
+    let indicator=document.getElementsByClassName("typing-indicator")[0];
+    indicator.innerHTML=data;
+    indicator.innerHTML='';
 })
 
 function exit() {
@@ -294,8 +297,22 @@ function forMobie() {
 
 
 sendBtn.addEventListener('click', send);
+
 input.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         send();
     }
+    else{
+        let data={
+            id:toid,
+            msg:"typing....."
+        }
+        socket.emit('typing',data);
+    }
+
 });
+
+
+
+
+

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="/home/aniket/web/chatapp/client/public/style.css"> -->
     <link rel="stylesheet" href="style.css">
     <title>Chat App</title>
 </head>
@@ -31,18 +32,20 @@
             </div>
             <div class="right">
                 <div class="chat-header">
-                    <button onclick="logout()">Logout</button>
+                    
                     <div class="title">
                         <div class="img-container">
-                            <img src="/image/exit.png" onclick="exit()"  alt="" srcset="">
+                            <img src="/image/exit.png" onclick="exit()" alt="" srcset="">
                         </div>
+                        <div class="typing-indicator"></div>
+                        <button onclick="logout()">Logout</button>
                     </div>
                 </div>
                 <div class="chat-body">
                     <div class="chats"></div>
                     <div class="reader">
                         <input type="text" name="" id="input" placeholder="Type messages">
-                        <div class="send-btn" ><img src="/image/send.jpeg" alt="" srcset=""></div>
+                        <div class="send-btn"><img src="/image/send.jpeg" alt="" srcset=""></div>
                     </div>
                 </div>
             </div>

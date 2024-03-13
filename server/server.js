@@ -204,6 +204,10 @@ io.on('connection', async (socket) => {
         }
     });
     
+    socket.on('typing',function(data){
+        io.to(data.id).emit('typing',('typing'));
+    });
+
 
     socket.on('chat_message', (data) => {
         let index=connectedUser.indexOf(data.id);
