@@ -1,12 +1,14 @@
-const LinkList = require('./linklist');
-const User_list = require('./onlineusermessage');
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
+// const linklist=require('./linklist');
+const dotev = require('dotenv');
+
+
+
 
 var signinname, signinmail;
 const app = express();
@@ -15,17 +17,18 @@ const io = new Server(server);
 
 app.use(cookieParser());
 
-const connectedUser = [];
-const userList = new User_list();
+dotev.config();
 
 
-mongoose.connect('mongodb+srv://admin-aniket:Test123@cluster0.bikic.mongodb.net/userDB').catch(err => console.log(err));
+
+
+mongoose.connect(process.env.database_url).catch(err => console.log(err));
 const userSchema = new mongoose.Schema({
     ioid: String,
     name: String,
     email: String,
     password: String,
-    mobNo: String
+    mobNo: String,
 });
 
 const User = mongoose.model('User', userSchema);
@@ -60,7 +63,9 @@ app.get("/signup", function (req, res) {
 });
 
 
+app.get("/logout",function(req,res){
 
+});
 
 
 
@@ -167,7 +172,7 @@ app.get("/main", function (req, res) {
 
 app.post("/getmesseges", function (req, res) {
     let username = req.body.username;
-    let temp = userList.findAndDelete(username);
+    // let temp = userList.findAndDelete(username);
     if (temp !== null) {
         let data = express.json
         res.send(temp.msg);
@@ -186,8 +191,7 @@ app.post("/getmesseges", function (req, res) {
 
 io.on('connection', async (socket) => {
 
-    console.log(socket.id);
-    connectedUser.push(socket.id);
+    ll.insert(socket.id);
 
     socket.on('update', async (msg) => {
         filter = { email: msg };
@@ -210,8 +214,9 @@ io.on('connection', async (socket) => {
 
 
     socket.on('chat_message', (data) => {
-        let index=connectedUser.indexOf(data.id);
-        if (index !== -1) {
+     
+        ll.print();
+        if (ll.find(data.id)) {
             io.to(data.id).emit('message', data);
         }
         else {
@@ -232,12 +237,11 @@ io.on('connection', async (socket) => {
 
 
     socket.on('disconnect', async () => {
-        let index = connectedUser.indexOf(socket.id);
-        if (index !== -1) {
-            connectedUser.splice(index, 1); 
+        if(ll.findAndDelete(socket.id)){
+            console.log(socket.id + "disconnected");
         }
         else{
-            console.log("user not find");
+            console.log("internal error");
         }
     });
     
