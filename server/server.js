@@ -4,8 +4,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
-// const linklist=require('./linklist');
 const dotev = require('dotenv');
+const fs = require('fs');
+const socketIds = [];
 
 
 
@@ -90,31 +91,34 @@ app.post("/verify", function (req, res) {
         })
 });
 
-app.post("/signup", function (req, res) {
 
-    const user = new User({
-        ioid: "istoupdate",
-        name: req.body.name,
-        email: req.body.mail,
-        password: req.body.pass,
-        mobNo: req.body.contactno
 
-    });
-    user.save()
-        .then(savedUser => {
-            name = req.body.name;
-
-            const htmlPath = path.join(__dirname, "../client/views/main.html");
-            let html = fs.readFileSync(htmlPath, 'utf8');
-            html = html.replace('{{username}}', savedUser.name);
-            html = html.replace('{{mail}}', savedUser.email);
-            res.redirect("/main");
-        })
-        .catch(err => {
-            console.error('Error saving user:', err);
-            res.status(500).send('Error saving user');
+// Signup route
+app.post("/signup", async (req, res) => {
+    try {
+        
+       
+        const user = new User({
+            ioid: "istoupdate",
+            name: req.body.name,
+            email: req.body.mail,
+            password: req.body.pass,
+            mobNo: req.body.contactno,
         });
+
+      
+        const savedUser = await user.save();
+
+       
+      
+        res.redirect("/");
+    } 
+    catch (err) {
+        console.error('Error saving user:', err);
+        res.status(500).send('Error saving user');
+    }
 });
+
 
 app.post("/verifysignin", function (req, res) {
     var mail = req.body.email;
@@ -168,22 +172,6 @@ app.get("/main", function (req, res) {
 
 
 
-// api for sending msg when the user is offline
-
-app.post("/getmesseges", function (req, res) {
-    let username = req.body.username;
-    // let temp = userList.findAndDelete(username);
-    if (temp !== null) {
-        let data = express.json
-        res.send(temp.msg);
-    }
-    else {
-        res.send([]);
-    }
-});
-
-
-
 
 
 // beneath is socket.io part;
@@ -191,7 +179,7 @@ app.post("/getmesseges", function (req, res) {
 
 io.on('connection', async (socket) => {
 
-    ll.insert(socket.id);
+    socketIds.push(socket.id);
 
     socket.on('update', async (msg) => {
         filter = { email: msg };
@@ -215,20 +203,13 @@ io.on('connection', async (socket) => {
 
     socket.on('chat_message', (data) => {
      
-        ll.print();
-        if (ll.find(data.id)) {
+       
+        if (socketIds.includes(data.id)) {
             io.to(data.id).emit('message', data);
         }
         else {
             console.log("Not existing user msg is saved in database");
-            let temp = userList.find(data.tomail);
-            if (temp) {
-                temp.msg.push({ from: data.from, msg: data.message.msg });
-            }
-            else {
-                let temp = userList.insert(data.tomail);
-                temp.msg.push({ from: data.from, msg: data.message.msg });
-            }
+            
         }
 
 
@@ -237,13 +218,15 @@ io.on('connection', async (socket) => {
 
 
     socket.on('disconnect', async () => {
-        if(ll.findAndDelete(socket.id)){
-            console.log(socket.id + "disconnected");
+        let index = socketIds.indexOf(socket.id); 
+        if (index === -1) { 
+            console.log("internal error: socket ID not found");
         }
-        else{
-            console.log("internal error");
+        else {
+            socketIds.splice(index, 1);
         }
     });
+    
     
 
 });
